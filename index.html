@@ -1,0 +1,286 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Title</title>
+    <style>
+        table {
+            margin: 100px auto;
+            border-collapse: collapse;
+        }
+
+        tr {
+            height: 33px;
+        }
+
+        td {
+            width: 30px;
+            height: 30px;
+            border: 1px solid #000;
+            cursor: default;
+        }
+
+        .selected {
+            background-color: #cccccc;
+        }
+    </style>
+</head>
+<body>
+<table style="width: 330px;">
+    <tr>
+        <td></td>
+        <td></td>
+        <td></td>
+        <td></td>
+        <td></td>
+        <td></td>
+        <td></td>
+        <td></td>
+        <td></td>
+        <td></td>
+    </tr>
+    <tr>
+        <td></td>
+        <td></td>
+        <td></td>
+        <td></td>
+        <td></td>
+        <td></td>
+        <td></td>
+        <td></td>
+        <td></td>
+        <td></td>
+    </tr>
+    <tr>
+        <td></td>
+        <td></td>
+        <td></td>
+        <td></td>
+        <td></td>
+        <td></td>
+        <td></td>
+        <td></td>
+        <td></td>
+        <td></td>
+    </tr>
+    <tr>
+        <td></td>
+        <td></td>
+        <td></td>
+        <td></td>
+        <td></td>
+        <td></td>
+        <td></td>
+        <td></td>
+        <td></td>
+        <td></td>
+    </tr>
+    <tr>
+        <td></td>
+        <td></td>
+        <td></td>
+        <td></td>
+        <td></td>
+        <td></td>
+        <td></td>
+        <td></td>
+        <td></td>
+        <td></td>
+    </tr>
+    <tr>
+        <td></td>
+        <td></td>
+        <td></td>
+        <td></td>
+        <td></td>
+        <td></td>
+        <td></td>
+        <td></td>
+        <td></td>
+        <td></td>
+    </tr>
+    <tr>
+        <td></td>
+        <td></td>
+        <td></td>
+        <td></td>
+        <td></td>
+        <td></td>
+        <td></td>
+        <td></td>
+        <td></td>
+        <td></td>
+    </tr>
+    <tr>
+        <td></td>
+        <td></td>
+        <td></td>
+        <td></td>
+        <td></td>
+        <td></td>
+        <td></td>
+        <td></td>
+        <td></td>
+        <td></td>
+    </tr>
+    <tr>
+        <td></td>
+        <td></td>
+        <td></td>
+        <td></td>
+        <td></td>
+        <td></td>
+        <td></td>
+        <td></td>
+        <td></td>
+        <td></td>
+    </tr>
+    <tr>
+        <td></td>
+        <td></td>
+        <td></td>
+        <td></td>
+        <td></td>
+        <td></td>
+        <td></td>
+        <td></td>
+        <td></td>
+        <td></td>
+    </tr>
+</table>
+<script>
+
+    //获取元素
+    var trs = document.querySelectorAll("tr");
+    var tds = document.querySelectorAll("td");
+    var table = document.querySelector("table");
+    //设置每个小方块的坐标
+    for (var i = 0; i < trs.length; i++) {
+        for (var j = 0; j < trs[i].children.length; j++) {
+            trs[i].children[j].x = i;
+            trs[i].children[j].y = j;
+//            trs[i].children[j].innerText = i + "-" + j;
+        }
+    }
+
+
+    var prePosX; //记录最初的横纵坐标
+    var prePosY;
+    var flagPre = 1;
+    var nowPosX; //记录鼠标最新的横纵坐标
+    var nowPosY;
+    var maxX; //获取选中区域最右下角的坐标
+    var maxY;
+    var minX; //获取选中区域最左上角的坐标
+    var minY;
+
+    //鼠标按下事件
+    document.body.onmousedown = function () {
+        for (var i = 0; i < tds.length; i++) {
+            tds[i].onmousemove = function () {
+                if (flagPre) {
+                    this.classList.add("selected");
+                    //记录最初的横纵坐标
+                    prePosX = this.x;
+                    prePosY = this.y;
+                    flagPre = 0;
+                }
+                //获取最新的横纵坐标
+                nowPosX = this.x;
+                nowPosY = this.y;
+                //获取左上和右下的坐标
+                maxX = prePosX > nowPosX ? prePosX : nowPosX;
+                minX = prePosX > nowPosX ? nowPosX : prePosX;
+                maxY = prePosY > nowPosY ? prePosY : nowPosY;
+                minY = prePosY > nowPosY ? nowPosY : prePosY;
+                for (var i = 0; i < tds.length; i++) {
+                    tds[i].classList.remove("selected");
+                }
+                //给选中的添加样式
+                for (var i = minX; i <= maxX; i++) {
+                    for (var j = minY; j <= maxY; j++) {
+                        if (getTd(i, j)) {
+                            getTd(i, j).classList.add("selected");
+                        }
+                    }
+                }
+            }
+        }
+        return false;
+    }
+
+
+    //鼠标抬起事件
+    document.body.onmouseup = function () {
+        //最左上角的方格设置单元格合并
+        //如果还包含已经合并的对象，取消合并效果
+        if (getTd(minX, minY)) {
+            for (var i = 0; i < tds.length; i++) {
+                if (tds[i].className == "done selected") {
+                    todefault();
+                    for (var i = 0; i < tds.length; i++) {
+                        tds[i].onmousemove = null;
+                        tds[i].classList.remove("selected");
+                    }
+                    return false;
+                }
+            }
+            getTd(minX, minY).setAttribute("rowspan", maxX - minX + 1);
+            getTd(minX, minY).setAttribute("colspan", maxY - minY + 1);
+        }
+        //消除被合并了的单元格
+        for (var i = 0; i < tds.length; i++) {
+            if (tds[i].className == "selected" && (tds[i].x != minX || tds[i].y != minY)) {
+                tds[i].style.display = "none";
+            }
+            tds[i].onmousemove = null;
+            tds[i].classList.remove("selected");
+        }
+        //初始化坐标
+        getTd(minX, minY).classList.add("done");
+        todefault();
+    }
+
+
+    /**
+     * 通过x,y获取单元格
+     * @param x
+     * @param y
+     * @returns {*}
+     */
+    function getTd(x, y) {
+        var targetTd;
+        for (var i = 0; i < trs.length; i++) {
+            for (var j = 0; j < trs[i].children.length; j++) {
+                trs[i].children[j].x = i;
+                trs[i].children[j].y = j;
+            }
+        }
+        for (var i = 0; i < tds.length; i++) {
+            if (tds[i].x == x && tds[i].y == y) {
+                targetTd = tds[i];
+            }
+        }
+        return targetTd;
+    }
+
+
+    /**
+     * 初始化参数
+     */
+    function todefault() {
+        prePosX = 0;
+        prePosY = 0;
+        flagPre = 1;
+        nowPosX = 0;
+        nowPosY = 0;
+        maxX = 0;
+        maxY = 0;
+        minX = 0;
+        minY = 0;
+    }
+
+
+</script>
+</body>
+</html>
